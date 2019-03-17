@@ -9,7 +9,7 @@ computer program. It is used for creating and evolving programs used in the
 #
 # License: BSD 3 clause
 
-from copy import deepcopy
+from copy import copy
 
 import numpy as np
 from sklearn.utils.random import sample_without_replacement
@@ -515,7 +515,7 @@ class _Program(object):
 
     def reproduce(self):
         """Return a copy of the embedded program."""
-        return deepcopy(self.program)
+        return copy(self.program)
 
     def crossover(self, donor, random_state):
         """Perform the crossover genetic operation on the program.
@@ -625,13 +625,11 @@ class _Program(object):
             The flattened tree representation of the program.
 
         """
-        program = deepcopy(self.program)
+        program = copy(self.program)
 
         # Get the nodes to modify
-        mutate = np.where([True if (random_state.uniform() <
-                                    self.p_point_replace)
-                           else False
-                           for _ in range(len(program))])[0]
+        mutate = np.where(random_state.uniform(size=len(program)) <
+                          self.p_point_replace)[0]
 
         for node in mutate:
             if isinstance(program[node], _Function):
