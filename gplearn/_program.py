@@ -196,10 +196,10 @@ class _Program(object):
             else:
                 # We need a terminal, add a variable or constant
                 if self.const_range is not None:
-                    terminal = random_state.randint(self.n_features + 1)
+                    terminal = random_state.randint(self.n_features * 2)
                 else:
                     terminal = random_state.randint(self.n_features)
-                if terminal == self.n_features:
+                if terminal >= self.n_features:
                     terminal = random_state.uniform(*self.const_range)
                     if self.const_range is None:
                         # We should never get here
@@ -644,10 +644,10 @@ class _Program(object):
             else:
                 # We've got a terminal, add a const or variable
                 if self.const_range is not None:
-                    terminal = random_state.randint(self.n_features + 1)
+                    terminal = random_state.randint(self.n_features * 2)
                 else:
                     terminal = random_state.randint(self.n_features)
-                if terminal == self.n_features:
+                if terminal >= self.n_features:
                     terminal = random_state.uniform(*self.const_range)
                     if self.const_range is None:
                         # We should never get here
