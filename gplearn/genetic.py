@@ -230,7 +230,7 @@ class BaseSymbolic(six.with_metaclass(ABCMeta, BaseEstimator)):
         else:
             # Estimate remaining time for run
             gen = run_details['generation'][-1]
-            generation_time = run_details['generation_time'][-1]
+            generation_time = np.mean(run_details['generation_time'][-3:])
             remaining_time = (self.generations - gen - 1) * generation_time
             if remaining_time > 60:
                 remaining_time = '{0:.2f}m'.format(remaining_time / 60.0)
@@ -241,7 +241,8 @@ class BaseSymbolic(six.with_metaclass(ABCMeta, BaseEstimator)):
             line_format = '{:4d} {:8.2f} {:16g} {:8d} {:16g} {:>16} {:>10}'
             if self.max_samples < 1.0:
                 oob_fitness = run_details['best_oob_fitness'][-1]
-                line_format = '{:4d} {:8.2f} {:16g} {:8d} {:16g} {:16g} {:>10}'
+                line_format = '{:4d} {:8.2f} {:16.8f} {:8d} {:16.8f} {:16.8f} {:>10}'
+                # line_format = '{:4d} {:8.2f} {:16g} {:8d} {:16g} {:16g} {:>10}'
 
             print(line_format.format(run_details['generation'][-1],
                                      run_details['average_length'][-1],
@@ -383,6 +384,7 @@ class BaseSymbolic(six.with_metaclass(ABCMeta, BaseEstimator)):
                                  'average_fitness': [],
                                  'best_length': [],
                                  'best_fitness': [],
+                                 'best_program': [],
                                  'best_oob_fitness': [],
                                  'generation_time': []}
 
@@ -443,6 +445,8 @@ class BaseSymbolic(six.with_metaclass(ABCMeta, BaseEstimator)):
             if self.parsimony_coefficient == 'auto':
                 parsimony_coefficient = (np.cov(length, fitness)[1, 0] /
                                          np.var(length))
+                # parsimony_coefficient = parsimony_coefficient * parsimony_coefficient
+                # print('parsimony_coefficient:', parsimony_coefficient)
             for program in population:
                 program.fitness_ = program.fitness(parsimony_coefficient)
 
@@ -476,6 +480,7 @@ class BaseSymbolic(six.with_metaclass(ABCMeta, BaseEstimator)):
             self.run_details_['average_fitness'].append(np.mean(fitness))
             self.run_details_['best_length'].append(best_program.length_)
             self.run_details_['best_fitness'].append(best_program.raw_fitness_)
+            self.run_details_['best_program'].append(best_program)
             oob_fitness = np.nan
             if self.max_samples < 1.0:
                 oob_fitness = best_program.oob_fitness_
